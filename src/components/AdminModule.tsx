@@ -39,6 +39,10 @@ export const AdminModule: React.FC<AdminModuleProps> = ({ onAdminLogout }) => {
   const [flowActive, setFlowActive] = useState(true);
   const [flowComercio, setFlowComercio] = useState("95284");
   const [flowSecret, setFlowSecret] = useState("f62e8461ab1c9d81e187b8d65421a1f4");
+  const [flowLinkCiudadano, setFlowLinkCiudadano] = useState("");
+  const [flowLinkPeriodista, setFlowLinkPeriodista] = useState("");
+  const [flowLinkEmpresa, setFlowLinkEmpresa] = useState("");
+  const [flowLinkMunicipio, setFlowLinkMunicipio] = useState("");
 
   const [stripeActive, setStripeActive] = useState(true);
   const [stripePublic, setStripePublic] = useState("pk_test_51Oq8rTH...982x");
@@ -80,6 +84,10 @@ export const AdminModule: React.FC<AdminModuleProps> = ({ onAdminLogout }) => {
         setFlowActive(data.flowActive !== false);
         setFlowComercio(data.flowComercio || "");
         setFlowSecret(data.flowSecret || "");
+        setFlowLinkCiudadano(data.flowLinkCiudadano || "");
+        setFlowLinkPeriodista(data.flowLinkPeriodista || "");
+        setFlowLinkEmpresa(data.flowLinkEmpresa || "");
+        setFlowLinkMunicipio(data.flowLinkMunicipio || "");
         setStripeActive(data.stripeActive !== false);
         setStripePublic(data.stripePublic || "");
         setStripeSecret(data.stripeSecret || "");
@@ -165,6 +173,10 @@ export const AdminModule: React.FC<AdminModuleProps> = ({ onAdminLogout }) => {
         flowActive,
         flowComercio,
         flowSecret,
+        flowLinkCiudadano,
+        flowLinkPeriodista,
+        flowLinkEmpresa,
+        flowLinkMunicipio,
         stripeActive,
         stripePublic,
         stripeSecret,
@@ -739,6 +751,59 @@ export const AdminModule: React.FC<AdminModuleProps> = ({ onAdminLogout }) => {
                       disabled={!flowActive}
                       className="bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 shadow-inner font-mono disabled:opacity-50"
                     />
+                  </div>
+
+                  {/* Flow Direct Payment Links */}
+                  <div className="mt-4 pt-3 border-t border-slate-300/60 space-y-2">
+                    <span className="text-[9px] font-mono uppercase text-slate-500 font-bold block">Enlaces de Pago (Botones Flow.cl)</span>
+                    
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[8px] font-mono text-slate-400 uppercase">Enlace Plan Ciudadano</label>
+                      <input
+                        type="url"
+                        value={flowLinkCiudadano}
+                        onChange={(e) => setFlowLinkCiudadano(e.target.value)}
+                        placeholder="https://www.flow.cl/btn.php?token=..."
+                        disabled={!flowActive}
+                        className="bg-slate-50 border border-slate-300 rounded-lg p-2 text-[10px] text-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 font-mono disabled:opacity-50"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[8px] font-mono text-slate-400 uppercase">Enlace Plan Periodista</label>
+                      <input
+                        type="url"
+                        value={flowLinkPeriodista}
+                        onChange={(e) => setFlowLinkPeriodista(e.target.value)}
+                        placeholder="https://www.flow.cl/btn.php?token=..."
+                        disabled={!flowActive}
+                        className="bg-slate-50 border border-slate-300 rounded-lg p-2 text-[10px] text-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 font-mono disabled:opacity-50"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[8px] font-mono text-slate-400 uppercase">Enlace Plan Empresa</label>
+                      <input
+                        type="url"
+                        value={flowLinkEmpresa}
+                        onChange={(e) => setFlowLinkEmpresa(e.target.value)}
+                        placeholder="https://www.flow.cl/btn.php?token=..."
+                        disabled={!flowActive}
+                        className="bg-slate-50 border border-slate-300 rounded-lg p-2 text-[10px] text-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 font-mono disabled:opacity-50"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[8px] font-mono text-slate-400 uppercase">Enlace Plan Municipio</label>
+                      <input
+                        type="url"
+                        value={flowLinkMunicipio}
+                        onChange={(e) => setFlowLinkMunicipio(e.target.value)}
+                        placeholder="https://www.flow.cl/btn.php?token=..."
+                        disabled={!flowActive}
+                        className="bg-slate-50 border border-slate-300 rounded-lg p-2 text-[10px] text-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 font-mono disabled:opacity-50"
+                      />
+                    </div>
                   </div>
                 </div>
                 <p className="text-[8.5px] text-slate-500 leading-normal font-mono mt-3 border-t border-slate-300/60 pt-2">

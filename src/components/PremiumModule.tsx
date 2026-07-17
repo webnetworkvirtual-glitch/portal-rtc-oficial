@@ -136,6 +136,19 @@ export const PremiumModule: React.FC<PremiumModuleProps> = ({
     if (!selectedPlan || !currentUser) return;
     setProcessing(true);
 
+    // Check if we have a real direct link configured for Flow for this plan
+    let directLink = "";
+    if (paymentMethod === "flow" && paymentConfig) {
+      if (selectedPlan.id === "ciudadano") directLink = paymentConfig.flowLinkCiudadano;
+      if (selectedPlan.id === "periodista") directLink = paymentConfig.flowLinkPeriodista;
+      if (selectedPlan.id === "empresa") directLink = paymentConfig.flowLinkEmpresa;
+      if (selectedPlan.id === "municipio") directLink = paymentConfig.flowLinkMunicipio;
+    }
+
+    if (directLink) {
+      window.open(directLink, "_blank");
+    }
+
     try {
       const response = await fetch("/api/simulate-payment", {
         method: "POST",
@@ -452,7 +465,29 @@ export const PremiumModule: React.FC<PremiumModuleProps> = ({
                 {/* Flow Credential Info / Configuration Alert */}
                 {paymentMethod === "flow" && (
                   <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-xl text-[10px] text-amber-800 leading-relaxed font-sans">
-                    <strong>Configuración de Flow:</strong> Ideal para operaciones en Chile. El sistema simulará el procesamiento REST API con firma HMAC MD5 según las normativas de Flow.cl.
+                    {(() => {
+                      let directLink = "";
+                      if (paymentConfig) {
+                        if (selectedPlan.id === "ciudadano") directLink = paymentConfig.flowLinkCiudadano;
+                        if (selectedPlan.id === "periodista") directLink = paymentConfig.flowLinkPeriodista;
+                        if (selectedPlan.id === "empresa") directLink = paymentConfig.flowLinkEmpresa;
+                        if (selectedPlan.id === "municipio") directLink = paymentConfig.flowLinkMunicipio;
+                      }
+                      
+                      if (directLink) {
+                        return (
+                          <span>
+                            <strong>¡Enlace Real de Flow Detectado!</strong> Al confirmar, serás redirigido de forma segura a Flow.cl para completar tu suscripción real. Tu cuenta en el portal se activará simultáneamente para brindarte acceso inmediato.
+                          </span>
+                        );
+                      }
+                      
+                      return (
+                        <span>
+                          <strong>Configuración de Flow:</strong> Ideal para operaciones en Chile. El sistema simulará el procesamiento REST API con firma HMAC MD5 según las normativas de Flow.cl.
+                        </span>
+                      );
+                    })()}
                   </div>
                 )}
 

@@ -198,12 +198,22 @@ export const SEED_REPORTS: Report[] = [
 ];
 
 export const CHILEAN_REGIONS = [
-  { name: "Región Metropolitana", comunas: ["Santiago", "Las Condes", "Providencia", "Ñuñoa", "Vitacura", "Maipú", "La Florida", "Puente Alto"] },
-  { name: "Región de Valparaíso", comunas: ["Valparaíso", "Viña del Mar", "Quilpué", "Villa Alemana", "San Antonio", "Concon"] },
-  { name: "Región del Biobío", comunas: ["Concepción", "Talcahuano", "San Pedro de la Paz", "Chiguayante", "Los Ángeles", "Coronel"] },
-  { name: "Región de la Araucanía", comunas: ["Temuco", "Padre Las Casas", "Villarrica", "Pucón", "Angol"] },
-  { name: "Región de Coquimbo", comunas: ["La Serena", "Coquimbo", "Ovalle", "Illapel"] },
-  { name: "Región de Antofagasta", comunas: ["Antofagasta", "Calama", "Tocopilla", "Mejillones"] }
+  { name: "Región de Arica y Parinacota", comunas: ["Arica", "Camarones", "Putre", "General Lagos"] },
+  { name: "Región de Tarapacá", comunas: ["Iquique", "Alto Hospicio", "Pozo Almonte", "Pica", "Huara", "Camiña", "Colchane"] },
+  { name: "Región de Antofagasta", comunas: ["Antofagasta", "Calama", "Tocopilla", "Mejillones", "Taltal", "Sierra Gorda", "San Pedro de Atacama", "Ollagüe", "María Elena"] },
+  { name: "Región de Atacama", comunas: ["Copiapó", "Vallenar", "Caldera", "Chañaral", "Diego de Almagro", "Huasco", "Freirina", "Tierra Amarilla", "Alto del Carmen"] },
+  { name: "Región de Coquimbo", comunas: ["La Serena", "Coquimbo", "Ovalle", "Illapel", "Vicuña", "Salamanca", "Los Vilos", "Monte Patria", "Andacollo", "Combarbalá", "Punitaqui"] },
+  { name: "Región de Valparaíso", comunas: ["Valparaíso", "Viña del Mar", "Quilpué", "Villa Alemana", "San Antonio", "Quillota", "San Felipe", "Los Andes", "Concón", "Limache", "Quintero", "Casablanca", "La Ligua"] },
+  { name: "Región Metropolitana", comunas: ["Santiago", "Las Condes", "Providencia", "Ñuñoa", "Vitacura", "Maipú", "La Florida", "Puente Alto", "San Bernardo", "Pudahuel", "Estación Central", "Recoleta", "Quilicura", "Peñalolén", "La Reina", "Macul", "Colina", "Lampa", "Melipilla", "Talagante", "Buin", "Paine", "San Miguel", "La Cisterna", "Lo Barnechea"] },
+  { name: "Región del Libertador General Bernardo O'Higgins", comunas: ["Rancagua", "San Fernando", "Pichilemu", "Rengo", "Machalí", "Graneros", "San Vicente", "Santa Cruz", "Chimbarongo", "Mostazal", "Requínoa", "Nancagua", "Doñihue"] },
+  { name: "Región del Maule", comunas: ["Talca", "Curicó", "Linares", "Constitución", "Cauquenes", "San Javier", "Molina", "Parral", "Curepto", "Chanco", "Teno", "Romeral", "Longaví"] },
+  { name: "Región de Ñuble", comunas: ["Chillán", "San Carlos", "Coihueco", "Pinto", "Bulnes", "Quirihue", "Yungay", "El Carmen", "Coelemu", "Ninhue", "San Nicolás", "Quillón"] },
+  { name: "Región del Biobío", comunas: ["Concepción", "Talcahuano", "San Pedro de la Paz", "Chiguayante", "Los Ángeles", "Coronel", "Hualpén", "Lota", "Tomé", "Cabrero", "Arauco", "Mulchén", "Nacimiento", "Yumbel", "Hualqui", "Cañete"] },
+  { name: "Región de la Araucanía", comunas: ["Temuco", "Padre Las Casas", "Villarrica", "Pucón", "Angol", "Lautaro", "Victoria", "Collipulli", "Carahue", "Nueva Imperial", "Loncoche", "Traiguén", "Purén", "Gorbea", "Curacautín"] },
+  { name: "Región de Los Ríos", comunas: ["Valdivia", "La Unión", "Río Bueno", "Panguipulli", "Mariquina", "Futrono", "Lanco", "Paillaco", "Los Lagos", "Corral", "Máfil", "Lago Ranco"] },
+  { name: "Región de Los Lagos", comunas: ["Puerto Montt", "Osorno", "Castro", "Ancud", "Puerto Varas", "Chonchi", "Quellón", "Frutillar", "Llanquihue", "Purranque", "Calbuco", "Fresia", "Maullín", "Rio Negro"] },
+  { name: "Región de Aysén del General Carlos Ibáñez del Campo", comunas: ["Coyhaique", "Puerto Aysén", "Chile Chico", "Cochrane", "Cisnes", "Guaitecas", "O'Higgins", "Lago Verde", "Tortel"] },
+  { name: "Región de Magallanes y de la Antártica Chilena", comunas: ["Punta Arenas", "Puerto Natales", "Porvenir", "Cabo de Hornos", "Torres del Paine", "Primavera", "Timaukel"] }
 ];
 
 export const REPORT_CATEGORIES = [

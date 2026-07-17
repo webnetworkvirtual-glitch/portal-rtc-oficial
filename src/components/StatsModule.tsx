@@ -88,7 +88,7 @@ export const StatsModule: React.FC = () => {
             {/* Interactive Region Selector */}
             <div className="flex flex-col gap-2">
               <label className="text-[10px] font-mono uppercase text-slate-500 font-bold">Seleccionar Región Administrativa</label>
-              <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-200/50 rounded-xl shadow-inner">
+              <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-200/50 rounded-xl shadow-inner max-h-[160px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300">
                 {CHILEAN_REGIONS.map((reg) => (
                   <button
                     key={reg.name}
