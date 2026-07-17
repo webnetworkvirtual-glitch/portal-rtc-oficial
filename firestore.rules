@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Red de Transparencia Ciudadana security rules
+    
+    // Entities can be read by anyone. Writes are allowed for authenticated users or for demo seeding.
+    match /entities/{entityId} {
+      allow read: if true;
+      allow write: if true; // Demo permissive write to allow first-time seeding and client-side updates.
+    }
+    
+    // Reports can be read by anyone. Creating a report is allowed.
+    match /reports/{reportId} {
+      allow read: if true;
+      allow write: if true; // Permissive for demo to allow reporting, editing status, or right to reply.
+    }
+    
+    // Premium profiles
+    match /premium_status/{email} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // Settings or audit logs
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

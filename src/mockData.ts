@@ -1,0 +1,220 @@
+import { Entity, Report } from "./types";
+
+export const SEED_ENTITIES: Entity[] = [
+  {
+    id: "constructora-abc",
+    name: "Constructora ABC Chile S.A.",
+    rut: "76.452.981-K",
+    type: "empresa",
+    domain: "constructoraabc.cl",
+    phone: "+56 2 2489 5000",
+    email: "contacto@constructoraabc.cl",
+    address: "Av. Apoquindo 4500, Oficina 801",
+    category: "Constructores / Inmobiliarias",
+    comuna: "Las Condes",
+    region: "Metropolitana",
+    totalReports: 12,
+    resolvedReports: 7,
+    avgResponseTime: 4, // 4 days
+    evidenceLevel: 4.2,
+    isVerified: true,
+    createdAt: "2025-01-15T10:00:00Z"
+  },
+  {
+    id: "muni-santiago",
+    name: "Ilustre Municipalidad de Santiago",
+    rut: "69.070.300-4",
+    type: "organismo",
+    domain: "munistgo.cl",
+    phone: "+56 2 2827 1200",
+    email: "transparencia@munistgo.cl",
+    address: "Plaza de Armas s/n",
+    category: "Municipalidades",
+    comuna: "Santiago",
+    region: "Metropolitana",
+    totalReports: 8,
+    resolvedReports: 5,
+    avgResponseTime: 8,
+    evidenceLevel: 3.8,
+    isVerified: true,
+    createdAt: "2024-11-20T14:30:00Z"
+  },
+  {
+    id: "banco-digital-cl",
+    name: "Banco Digital Chile S.A. (Simulado)",
+    rut: "97.102.340-9",
+    type: "empresa",
+    domain: "bancodigital.cl",
+    phone: "+56 600 300 4000",
+    email: "seguridad@bancodigital.cl",
+    address: "Huérfanos 1219",
+    category: "Finanzas y Bancos",
+    comuna: "Santiago",
+    region: "Metropolitana",
+    totalReports: 15,
+    resolvedReports: 11,
+    avgResponseTime: 2,
+    evidenceLevel: 4.5,
+    isVerified: true,
+    createdAt: "2025-03-10T09:00:00Z"
+  },
+  {
+    id: "tecno-market-chile",
+    name: "TecnoMarket Express Ltda.",
+    rut: "77.892.401-2",
+    type: "empresa",
+    domain: "tecnomarketcl.cl",
+    phone: "+56 9 8472 1022",
+    email: "soporte@tecnomarketcl.cl",
+    address: "Av. Providencia 1344",
+    category: "E-Commerce / Marketplace",
+    comuna: "Providencia",
+    region: "Metropolitana",
+    totalReports: 6,
+    resolvedReports: 1,
+    avgResponseTime: 12,
+    evidenceLevel: 2.5,
+    isVerified: false,
+    createdAt: "2025-05-02T11:45:00Z"
+  }
+];
+
+export const SEED_REPORTS: Report[] = [
+  {
+    id: "rep-001",
+    entityId: "constructora-abc",
+    targetName: "Constructora ABC Chile S.A.",
+    title: "Retraso de más de 8 meses en entrega de Departamento Condominio El Roble",
+    description: "Compramos un departamento en verde con fecha de entrega comprometida para Octubre de 2025. Al día de hoy, Julio de 2026, siguen aplazando las firmas de escritura sin entregar una fecha certera de recepción municipal. No responden correos oficiales y las oficinas comerciales no dan explicaciones.",
+    category: "Retrasos",
+    evidenceLevelScore: 4,
+    evidenceDocuments: ["promesa_compraventa.pdf", "comprobante_pie.pdf"],
+    status: "aprobado",
+    userId: "user-123",
+    userName: "Andrés Silva",
+    userEmail: "andres.silva.cl@gmail.com",
+    createdAt: "2026-06-12T15:24:00Z",
+    isAnonymized: true,
+    isModerated: true,
+    aiDefamationExplanation: "El relato se centra en hechos demostrables con fechas y documentos adjuntos.",
+    officialResponse: {
+      id: "res-001",
+      responderName: "Constructora ABC - Relaciones Comunitarias",
+      responseText: "Lamentamos las molestias ocasionadas. La demora se debe a un retraso administrativo en la recepción municipal por observaciones viales de la DOM. Estamos trabajando para subsanarlas y estimamos escriturar a fines de Agosto de 2026. Ofrecemos compensación según contrato para todos los afectados.",
+      createdAt: "2026-06-15T09:12:00Z",
+      status: "publicado"
+    }
+  },
+  {
+    id: "rep-002",
+    entityId: "constructora-abc",
+    targetName: "Constructora ABC Chile S.A.",
+    title: "Cobro de gastos comunes inflados y no justificados en Edificio San Francisco",
+    description: "Se están cobrando valores que duplican el promedio del sector sin entregar las liquidaciones ni las facturas de respaldo de las mantenciones de ascensores. Nos unimos 14 copropietarios para exigir la auditoría de la administración delegada por la constructora.",
+    category: "Irregularidades",
+    evidenceLevelScore: 5,
+    evidenceDocuments: ["liquidaciones_mayo_junio.pdf", "solicitud_auditoria.pdf"],
+    status: "aprobado",
+    userId: "user-456",
+    userName: "Camila Jara",
+    userEmail: "camila.jara@outlook.com",
+    createdAt: "2026-06-20T18:40:00Z",
+    isAnonymized: true,
+    isModerated: true,
+    officialResponse: {
+      id: "res-002",
+      responderName: "Constructora ABC - Administración General",
+      responseText: "Estimada Camila, se ha coordinado una reunión extraordinaria de copropietarios para el próximo Jueves 9 de Julio a las 19:30 hrs en el salón de eventos para transparentar todas las cartolas de gastos y respaldos de mantención.",
+      createdAt: "2026-06-23T14:15:00Z",
+      status: "publicado"
+    }
+  },
+  {
+    id: "rep-003",
+    entityId: "muni-santiago",
+    targetName: "Ilustre Municipalidad de Santiago",
+    title: "Demora excesiva en renovación de patentes comerciales sector Bellas Artes",
+    description: "Llevamos más de 90 días hábiles esperando la resolución para patentes de locales gastronómicos menores. El sistema digital muestra 'en revisión' y de forma presencial indican que falta personal de inspección vial. Esto nos impide operar de forma regular.",
+    category: "Retrasos",
+    evidenceLevelScore: 4,
+    evidenceDocuments: ["solicitud_patente_1032.pdf"],
+    status: "aprobado",
+    userId: "user-789",
+    userName: "Rodrigo Muñoz",
+    userEmail: "r.munoz.bellasartes@gmail.com",
+    createdAt: "2026-05-10T10:15:00Z",
+    isAnonymized: true,
+    isModerated: true,
+    officialResponse: {
+      id: "res-003",
+      responderName: "Subdirección de Rentas y Patentes",
+      responseText: "Informamos que se ha priorizado el lote de solicitudes de Bellas Artes. El inspector asignado visitará los locales comerciales durante esta semana para concretar la firma definitiva y entrega de patentes provisorias.",
+      createdAt: "2026-05-15T11:00:00Z",
+      status: "publicado"
+    }
+  },
+  {
+    id: "rep-004",
+    entityId: "banco-digital-cl",
+    targetName: "Banco Digital Chile S.A. (Simulado)",
+    title: "Phishing masivo y duplicación de cobros en compras internacionales",
+    description: "Detecté tres cargos duplicados por compras realizadas el 4 de Junio de 2026. Al contactar al soporte técnico del banco digital, me dicen que debo esperar 45 días hábiles para el contra-cargo, a pesar de tener comprobantes de que la pasarela de origen cobró una sola vez.",
+    category: "Fraudes Bancarios",
+    evidenceLevelScore: 4,
+    evidenceDocuments: ["cartola_cargos.pdf", "comprobante_origen.pdf"],
+    status: "denunciado_fiscalia",
+    userId: "user-999",
+    userName: "Patricia Lobos",
+    userEmail: "paty.lobos@gmx.cl",
+    createdAt: "2026-06-05T13:10:00Z",
+    isAnonymized: true,
+    isModerated: true,
+    aiDefamationExplanation: "Relato preciso y formal con adjuntos.",
+    officialResponse: {
+      id: "res-004",
+      responderName: "Mesa de Ayuda Especializada",
+      responseText: "Estimada Patricia, identificamos una intermitencia técnica temporal en el procesador internacional ese día. Tu abono por la diferencia se ha realizado hoy mismo y debería verse reflejado en tu saldo en un máximo de 24 horas hábiles.",
+      createdAt: "2026-06-08T17:30:00Z",
+      status: "publicado"
+    }
+  },
+  {
+    id: "rep-005",
+    entityId: "tecno-market-chile",
+    targetName: "TecnoMarket Express Ltda.",
+    title: "Producto nunca entregado y sin reembolso posterior",
+    description: "Compré una tablet para regalo por un valor de $189.990. El plazo de despacho era de 3 días hábiles. Ha pasado un mes y no entregan el producto ni realizan la devolución del dinero. En redes sociales eliminan los comentarios exigiendo respuestas.",
+    category: "Marketplace",
+    evidenceLevelScore: 3,
+    evidenceDocuments: ["boleta_compra_2943.pdf"],
+    status: "aprobado",
+    userId: "user-111",
+    userName: "Ignacio Pérez",
+    userEmail: "ignacio.perez.diseno@gmail.com",
+    createdAt: "2026-06-25T08:50:00Z",
+    isAnonymized: true,
+    isModerated: true
+  }
+];
+
+export const CHILEAN_REGIONS = [
+  { name: "Región Metropolitana", comunas: ["Santiago", "Las Condes", "Providencia", "Ñuñoa", "Vitacura", "Maipú", "La Florida", "Puente Alto"] },
+  { name: "Región de Valparaíso", comunas: ["Valparaíso", "Viña del Mar", "Quilpué", "Villa Alemana", "San Antonio", "Concon"] },
+  { name: "Región del Biobío", comunas: ["Concepción", "Talcahuano", "San Pedro de la Paz", "Chiguayante", "Los Ángeles", "Coronel"] },
+  { name: "Región de la Araucanía", comunas: ["Temuco", "Padre Las Casas", "Villarrica", "Pucón", "Angol"] },
+  { name: "Región de Coquimbo", comunas: ["La Serena", "Coquimbo", "Ovalle", "Illapel"] },
+  { name: "Región de Antofagasta", comunas: ["Antofagasta", "Calama", "Tocopilla", "Mejillones"] }
+];
+
+export const REPORT_CATEGORIES = [
+  "Retrasos",
+  "Irregularidades",
+  "Abuso de Autoridad",
+  "Fraudes Bancarios",
+  "Estafas",
+  "Marketplace",
+  "Vehículos",
+  "Licitaciones",
+  "Servicios Públicos",
+  "Publicidad Engañosa"
+];

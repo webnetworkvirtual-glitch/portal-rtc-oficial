@@ -1,0 +1,8 @@
+{
+  "name": "Red de Transparencia Ciudadana",
+  "description": "Plataforma ciudadana chilena para consultar antecedentes públicos, reportar incidentes, gestionar evidencias y promover la transparencia con derecho a respuesta.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
