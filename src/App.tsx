@@ -62,7 +62,7 @@ export default function App() {
     casesInProsecution: 7
   });
 
-  // Listen for Ctrl+Shift+M when backdoor click sequence is completed
+  // Listen for F1+Shift+M when backdoor click sequence is completed
   useEffect(() => {
     if (!backdoorActive) return;
 
@@ -73,8 +73,18 @@ export default function App() {
       setBackdoorActive(false); // timeout backdoor arming after 15 seconds
     }, 15000);
 
+    const activeKeys = new Set<string>();
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && (e.key === "m" || e.key === "M")) {
+      if (e.key === "F1") {
+        e.preventDefault();
+      }
+      activeKeys.add(e.key.toLowerCase());
+
+      const hasF1 = activeKeys.has("f1");
+      const hasM = activeKeys.has("m");
+
+      if (hasF1 && hasM && e.shiftKey) {
         e.preventDefault();
         setShowAdminLoginModal(true);
         setBackdoorActive(false);
@@ -82,9 +92,22 @@ export default function App() {
       }
     };
 
+    const handleKeyUp = (e: KeyboardEvent) => {
+      activeKeys.delete(e.key.toLowerCase());
+    };
+
+    const handleBlur = () => {
+      activeKeys.clear();
+    };
+
     window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("blur", handleBlur);
+
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("blur", handleBlur);
       clearTimeout(toastTimer);
     };
   }, [backdoorActive]);
@@ -1113,7 +1136,7 @@ export default function App() {
           <div className="w-2.5 h-2.5 rounded-full bg-purple-500 animate-ping"></div>
           <div className="flex flex-col">
             <span className="font-extrabold uppercase">MODO BACKDOOR ACTIVADO</span>
-            <span className="text-slate-400">Presione Ctrl+Shift+M para autenticar...</span>
+            <span className="text-slate-400">Presione F1 + Shift + m para autenticar...</span>
           </div>
         </div>
       )}
