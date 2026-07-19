@@ -34,7 +34,10 @@ import {
   CreditCard,
   Award,
   UserPlus,
-  LogIn
+  LogIn,
+  Smartphone,
+  Download,
+  Share
 } from "lucide-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 
@@ -61,6 +64,110 @@ export default function App() {
   // Security Sentinel States
   const [securityToast, setSecurityToast] = useState(false);
   const [securityToastMessage, setSecurityToastMessage] = useState("");
+
+  // PWA (Progressive Web App) Installation States
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [showIosTutorial, setShowIosTutorial] = useState(false);
+
+  // Register service worker and listen for PWA install events
+  useEffect(() => {
+    // Register Service Worker for offline and native app support
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .then((reg) => {
+            console.log("[PWA] Service Worker registrado con éxito en el ámbito:", reg.scope);
+          })
+          .catch((err) => {
+            console.error("[PWA] Error de registro de Service Worker:", err);
+          });
+      });
+    }
+
+    // Detect if already installed (standalone mode)
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches || (window.navigator as any).standalone === true;
+    if (isStandalone) {
+      localStorage.setItem("rtc_pwa_installed", "true");
+    }
+
+    // Detect if client is iOS
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
+    setIsIOS(isIosDevice);
+
+    // If iOS and not installed standalone, offer custom instructions after 5s
+    if (isIosDevice && !isStandalone && !localStorage.getItem("rtc_pwa_installed_dismissed")) {
+      const timer = setTimeout(() => {
+        setShowInstallBanner(true);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      // Store the event so it can be triggered later
+      setDeferredPrompt(e);
+      
+      // If user hasn't dismissed it before and not standalone
+      if (!isStandalone && !localStorage.getItem("rtc_pwa_installed_dismissed")) {
+        setShowInstallBanner(true);
+      }
+    };
+
+    const handleAppInstalled = () => {
+      setDeferredPrompt(null);
+      setShowInstallBanner(false);
+      localStorage.setItem("rtc_pwa_installed", "true");
+      setSecurityToastMessage("📱 ¡RTC INSTALADA CON ÉXITO! Acceso directo creado en tu dispositivo.");
+      setSecurityToast(true);
+      setTimeout(() => setSecurityToast(false), 4000);
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("appinstalled", handleAppInstalled);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", handleAppInstalled);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (isIOS) {
+      setShowIosTutorial(true);
+      return;
+    }
+
+    if (!deferredPrompt) {
+      setSecurityToastMessage("ℹ️ Tu navegador ya tiene la app instalada o la opción está lista en la barra de direcciones.");
+      setSecurityToast(true);
+      setTimeout(() => setSecurityToast(false), 3000);
+      return;
+    }
+
+    // Show the browser install prompt
+    deferredPrompt.prompt();
+
+    // Wait for choice
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") {
+      console.log("[PWA] El usuario aceptó la instalación de RTC");
+      localStorage.setItem("rtc_pwa_installed", "true");
+    } else {
+      console.log("[PWA] El usuario rechazó la instalación");
+    }
+
+    setDeferredPrompt(null);
+    setShowInstallBanner(false);
+  };
+
+  const handleDismissInstallBanner = () => {
+    setShowInstallBanner(false);
+    localStorage.setItem("rtc_pwa_installed_dismissed", "true");
+  };
 
   // Security Sentinel: DevTools & Right Click restrictions (Admin configured)
   useEffect(() => {
@@ -783,6 +890,28 @@ export default function App() {
         {/* Chile Transparency Footer */}
         <footer className="w-full text-center py-6 border-t border-slate-300/80 font-mono text-[10px] text-slate-500 uppercase tracking-widest mt-12 flex flex-col md:flex-row items-center justify-between gap-4">
           <span>© 2026 Red de Transparencia Ciudadana • CHILE</span>
+          
+          {/* Permanent PWA install button in footer */}
+          <button
+            type="button"
+            onClick={() => {
+              setShowInstallBanner(true);
+              if (isIOS) {
+                setShowIosTutorial(true);
+              } else if (deferredPrompt) {
+                handleInstallClick();
+              } else {
+                setSecurityToastMessage("ℹ️ Tu navegador ya tiene la app instalada o la opción está disponible en tu navegador.");
+                setSecurityToast(true);
+                setTimeout(() => setSecurityToast(false), 3000);
+              }
+            }}
+            className="flex items-center gap-1.5 text-[9px] font-bold text-orange-600 hover:text-orange-500 bg-orange-500/5 hover:bg-orange-500/10 border border-orange-200/50 hover:border-orange-300 rounded-xl px-3.5 py-1.5 transition-all shadow-sm cursor-pointer"
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+            Descargar Aplicación Móvil / PC
+          </button>
+
           <span>COMPATIBLE CON VERCEL & FIREBASE DEPLOYMENT</span>
         </footer>
 
@@ -1337,6 +1466,117 @@ export default function App() {
             <p className="text-[10.5px] text-slate-200 font-sans mt-1 leading-snug font-medium">
               {securityToastMessage}
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* PWA Floating Installation Banner */}
+      {showInstallBanner && (
+        <div className="fixed bottom-24 right-6 z-[9990] max-w-sm w-[90%] bg-slate-900/95 border border-orange-500/30 text-white rounded-2xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.6)] backdrop-blur-md flex flex-col gap-3 animate-fade-in">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-800 to-slate-950 border border-orange-500/30 flex items-center justify-center shrink-0 shadow-inner">
+                <Smartphone className="w-5 h-5 text-orange-500 animate-pulse" />
+              </div>
+              <div>
+                <h5 className="text-[10px] font-mono font-extrabold text-orange-400 uppercase tracking-wider">Aplicación Móvil / Escritorio</h5>
+                <h4 className="text-xs font-sans font-extrabold text-slate-100 uppercase tracking-tight">Llevar RTC en tu Dispositivo</h4>
+              </div>
+            </div>
+            <button 
+              type="button"
+              onClick={handleDismissInstallBanner}
+              className="text-slate-400 hover:text-slate-200 p-1 rounded-full hover:bg-slate-800 transition-all cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <p className="text-[10px] text-slate-300 font-sans leading-normal">
+            Instala la plataforma en tu teléfono o PC con un solo toque. Accede al instante sin usar almacenamiento adicional y con un rendimiento optimizado.
+          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <button
+              type="button"
+              onClick={handleDismissInstallBanner}
+              className="flex-1 py-2 border border-slate-700 hover:bg-slate-800 text-slate-300 text-[9px] font-mono uppercase font-bold rounded-xl transition-all cursor-pointer text-center"
+            >
+              Cerrar
+            </button>
+            <button
+              type="button"
+              onClick={handleInstallClick}
+              className="flex-1 py-2 bg-orange-600 hover:bg-orange-500 text-white text-[9px] font-mono uppercase font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-1 cursor-pointer text-center"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Instalar App 🚀
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* iOS PWA Installation Tutorial Modal */}
+      {showIosTutorial && (
+        <div 
+          onClick={() => setShowIosTutorial(false)}
+          className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 cursor-pointer"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="bg-slate-900 border border-orange-500/30 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative text-slate-100 cursor-default"
+          >
+            <button
+              type="button"
+              onClick={() => setShowIosTutorial(false)}
+              className="absolute top-4 right-4 text-slate-500 hover:text-slate-300 hover:bg-slate-800 p-1.5 rounded-full transition-all flex items-center justify-center"
+              aria-label="Cerrar"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 rounded-2xl bg-orange-950 border border-orange-500/30 flex items-center justify-center text-orange-400 mb-4 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]">
+                <Smartphone className="w-6 h-6 animate-pulse" />
+              </div>
+              <h3 className="text-sm font-sans font-extrabold text-white uppercase tracking-wider">Instalar en Apple iOS (Safari)</h3>
+              <p className="text-[9px] text-orange-400 font-mono mt-0.5 uppercase tracking-widest">Procedimiento para iPhone / iPad</p>
+              
+              <div className="w-full mt-6 space-y-4 text-left font-sans text-xs">
+                <div className="flex gap-3 items-start">
+                  <div className="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-mono font-bold text-slate-300 text-[10px] shrink-0 mt-0.5">
+                    1
+                  </div>
+                  <p className="text-slate-300 leading-normal text-[11px]">
+                    Presiona el botón de <span className="font-extrabold text-orange-400 inline-flex items-center gap-1 bg-orange-500/10 px-1 py-0.5 rounded"><Share className="w-3.5 h-3.5 inline" /> Compartir</span> en la barra de navegación de Safari.
+                  </p>
+                </div>
+
+                <div className="flex gap-3 items-start">
+                  <div className="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-mono font-bold text-slate-300 text-[10px] shrink-0 mt-0.5">
+                    2
+                  </div>
+                  <p className="text-slate-300 leading-normal text-[11px]">
+                    Desliza hacia abajo en el menú de opciones y selecciona <span className="font-extrabold text-white bg-slate-800 px-1.5 py-0.5 rounded">"Añadir a la pantalla de inicio"</span>.
+                  </p>
+                </div>
+
+                <div className="flex gap-3 items-start">
+                  <div className="w-5 h-5 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-mono font-bold text-slate-300 text-[10px] shrink-0 mt-0.5">
+                    3
+                  </div>
+                  <p className="text-slate-300 leading-normal text-[11px]">
+                    Confirma el nombre y presiona <span className="font-extrabold text-orange-400">"Añadir"</span> en la esquina superior derecha. ¡Y listo!
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowIosTutorial(false)}
+                className="w-full mt-6 bg-orange-600 hover:bg-orange-500 text-white font-mono text-xs font-bold uppercase py-3 rounded-xl shadow-md transition-all text-center cursor-pointer"
+              >
+                Entendido
+              </button>
+            </div>
           </div>
         </div>
       )}
