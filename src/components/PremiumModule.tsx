@@ -138,11 +138,16 @@ export const PremiumModule: React.FC<PremiumModuleProps> = ({
 
     // Check if we have a real direct link configured for Flow for this plan
     let directLink = "";
-    if (paymentMethod === "flow" && paymentConfig) {
-      if (selectedPlan.id === "ciudadano") directLink = paymentConfig.flowLinkCiudadano;
-      if (selectedPlan.id === "periodista") directLink = paymentConfig.flowLinkPeriodista;
-      if (selectedPlan.id === "empresa") directLink = paymentConfig.flowLinkEmpresa;
-      if (selectedPlan.id === "municipio") directLink = paymentConfig.flowLinkMunicipio;
+    if (paymentMethod === "flow") {
+      const configCiudadano = paymentConfig?.flowLinkCiudadano;
+      const configPeriodista = paymentConfig?.flowLinkPeriodista;
+      const configEmpresa = paymentConfig?.flowLinkEmpresa;
+      const configMunicipio = paymentConfig?.flowLinkMunicipio;
+
+      if (selectedPlan.id === "ciudadano") directLink = configCiudadano || "https://www.flow.cl/uri/n0b12Zj9T";
+      if (selectedPlan.id === "periodista") directLink = configPeriodista || "https://www.flow.cl/uri/Lbx1Q70Lg";
+      if (selectedPlan.id === "empresa") directLink = configEmpresa || "https://www.flow.cl/uri/TCp4VBjs3";
+      if (selectedPlan.id === "municipio") directLink = configMunicipio || "https://www.flow.cl/uri/ZNkK6NGwm";
     }
 
     if (directLink) {
@@ -467,12 +472,15 @@ export const PremiumModule: React.FC<PremiumModuleProps> = ({
                   <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-xl text-[10px] text-amber-800 leading-relaxed font-sans">
                     {(() => {
                       let directLink = "";
-                      if (paymentConfig) {
-                        if (selectedPlan.id === "ciudadano") directLink = paymentConfig.flowLinkCiudadano;
-                        if (selectedPlan.id === "periodista") directLink = paymentConfig.flowLinkPeriodista;
-                        if (selectedPlan.id === "empresa") directLink = paymentConfig.flowLinkEmpresa;
-                        if (selectedPlan.id === "municipio") directLink = paymentConfig.flowLinkMunicipio;
-                      }
+                      const configCiudadano = paymentConfig?.flowLinkCiudadano;
+                      const configPeriodista = paymentConfig?.flowLinkPeriodista;
+                      const configEmpresa = paymentConfig?.flowLinkEmpresa;
+                      const configMunicipio = paymentConfig?.flowLinkMunicipio;
+
+                      if (selectedPlan.id === "ciudadano") directLink = configCiudadano || "https://www.flow.cl/uri/n0b12Zj9T";
+                      if (selectedPlan.id === "periodista") directLink = configPeriodista || "https://www.flow.cl/uri/Lbx1Q70Lg";
+                      if (selectedPlan.id === "empresa") directLink = configEmpresa || "https://www.flow.cl/uri/TCp4VBjs3";
+                      if (selectedPlan.id === "municipio") directLink = configMunicipio || "https://www.flow.cl/uri/ZNkK6NGwm";
                       
                       if (directLink) {
                         return (

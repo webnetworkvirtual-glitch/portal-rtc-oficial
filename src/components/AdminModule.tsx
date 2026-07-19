@@ -39,10 +39,10 @@ export const AdminModule: React.FC<AdminModuleProps> = ({ onAdminLogout }) => {
   const [flowActive, setFlowActive] = useState(true);
   const [flowComercio, setFlowComercio] = useState("95284");
   const [flowSecret, setFlowSecret] = useState("f62e8461ab1c9d81e187b8d65421a1f4");
-  const [flowLinkCiudadano, setFlowLinkCiudadano] = useState("");
-  const [flowLinkPeriodista, setFlowLinkPeriodista] = useState("");
-  const [flowLinkEmpresa, setFlowLinkEmpresa] = useState("");
-  const [flowLinkMunicipio, setFlowLinkMunicipio] = useState("");
+  const [flowLinkCiudadano, setFlowLinkCiudadano] = useState("https://www.flow.cl/uri/n0b12Zj9T");
+  const [flowLinkPeriodista, setFlowLinkPeriodista] = useState("https://www.flow.cl/uri/Lbx1Q70Lg");
+  const [flowLinkEmpresa, setFlowLinkEmpresa] = useState("https://www.flow.cl/uri/TCp4VBjs3");
+  const [flowLinkMunicipio, setFlowLinkMunicipio] = useState("https://www.flow.cl/uri/ZNkK6NGwm");
 
   const [stripeActive, setStripeActive] = useState(true);
   const [stripePublic, setStripePublic] = useState("pk_test_51Oq8rTH...982x");
