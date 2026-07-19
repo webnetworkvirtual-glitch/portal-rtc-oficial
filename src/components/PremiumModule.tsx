@@ -76,6 +76,15 @@ export const PremiumModule: React.FC<PremiumModuleProps> = ({
   const [paymentMethod, setPaymentMethod] = useState<"flow" | "stripe" | "mercadopago">("flow");
   const [processing, setProcessing] = useState(false);
   const [paymentDone, setPaymentDone] = useState(false);
+  const [flowPending, setFlowPending] = useState(false);
+  const [flowOrderId, setFlowOrderId] = useState("");
+
+  const handleCloseModal = () => {
+    setSelectedPlan(null);
+    setFlowPending(false);
+    setFlowOrderId("");
+    setPaymentDone(false);
+  };
 
   // Advanced features unlocked mock state
   const [downloadedPdf, setDownloadedPdf] = useState(false);
@@ -134,7 +143,6 @@ export const PremiumModule: React.FC<PremiumModuleProps> = ({
 
   const handleExecutePayment = async () => {
     if (!selectedPlan || !currentUser) return;
-    setProcessing(true);
 
     // Check if we have a real direct link configured for Flow for this plan
     let directLink = "";
@@ -150,9 +158,16 @@ export const PremiumModule: React.FC<PremiumModuleProps> = ({
       if (selectedPlan.id === "municipio") directLink = configMunicipio || "https://www.flow.cl/uri/ZNkK6NGwm";
     }
 
-    if (directLink) {
-      window.open(directLink, "_blank");
+    // If it's Flow and we haven't shown the pending verification screen yet, transition there
+    if (paymentMethod === "flow" && !flowPending) {
+      if (directLink) {
+        window.open(directLink, "_blank");
+      }
+      setFlowPending(true);
+      return;
     }
+
+    setProcessing(true);
 
     try {
       const response = await fetch("/api/simulate-payment", {
@@ -163,13 +178,15 @@ export const PremiumModule: React.FC<PremiumModuleProps> = ({
           paymentMethod,
           email: currentUser.email,
           amount: calculatePrice(selectedPlan, billingCycle),
-          billingCycle
+          billingCycle,
+          flowOrderId: paymentMethod === "flow" ? flowOrderId : undefined
         })
       });
 
       const data = await response.json();
       if (response.ok && data.success) {
         setPaymentDone(true);
+        setFlowPending(false);
         onUpgradeSuccess(selectedPlan.id, billingCycle, data.transactionId);
       } else {
         throw new Error(data.error);
@@ -179,6 +196,7 @@ export const PremiumModule: React.FC<PremiumModuleProps> = ({
       alert("La pasarela de pago experimentó una intermitencia temporal. Procesando reintento offline...");
       onUpgradeSuccess(selectedPlan.id, billingCycle, `FLOW-MOCK-${Math.floor(Math.random() * 900000)}`);
       setPaymentDone(true);
+      setFlowPending(false);
     } finally {
       setProcessing(false);
     }
@@ -368,7 +386,7 @@ export const PremiumModule: React.FC<PremiumModuleProps> = ({
       {/* Interactive Payment Gateway Modal */}
       {selectedPlan && (
         <div 
-          onClick={() => setSelectedPlan(null)}
+          onClick={handleCloseModal}
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 backdrop-blur-sm p-4 cursor-pointer animate-fade-in"
         >
           <div 
@@ -379,7 +397,7 @@ export const PremiumModule: React.FC<PremiumModuleProps> = ({
             {/* Absolute close button ("X") */}
             <button
               type="button"
-              onClick={() => setSelectedPlan(null)}
+              onClick={handleCloseModal}
               className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 p-1.5 rounded-full transition-all flex items-center justify-center"
               aria-label="Cerrar"
             >
@@ -410,11 +428,95 @@ export const PremiumModule: React.FC<PremiumModuleProps> = ({
                   Su suscripción al <span className="font-bold text-slate-800">{selectedPlan.name}</span> se procesó a nivel de servidor Express y se guardó en Firestore de forma permanente. Las funciones premium están habilitadas.
                 </p>
                 <button
-                  onClick={() => setSelectedPlan(null)}
+                  onClick={handleCloseModal}
                   className="w-full bg-slate-900 hover:bg-slate-800 text-white font-mono text-xs font-bold uppercase py-3 rounded-xl mt-6"
                 >
                   Regresar a la Consola
                 </button>
+              </div>
+            ) : flowPending ? (
+              <div className="space-y-4">
+                <div className="flex flex-col items-center text-center p-3 bg-amber-500/5 border border-amber-500/20 rounded-2xl">
+                  <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500 flex items-center justify-center text-amber-600 mb-2.5">
+                    <RefreshCw className="w-6 h-6 animate-spin text-amber-600" />
+                  </div>
+                  <h4 className="text-xs font-sans font-extrabold text-amber-800 uppercase">Pago en Proceso en Flow.cl</h4>
+                  <p className="text-[10px] text-slate-500 font-sans mt-1 leading-normal max-w-sm">
+                    Te hemos redirigido a la pasarela de Flow para completar tu transacción de <span className="font-bold text-slate-700">{formatPrice(calculatePrice(selectedPlan, billingCycle))}</span> de forma segura.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[9px] font-mono uppercase text-slate-500 font-bold block">
+                    Confirmación de Transacción
+                  </label>
+                  <p className="text-[10px] text-slate-500 font-sans leading-relaxed">
+                    Una vez completado el pago en la ventana externa de Flow, ingresa tu número de Orden o simplemente confirma la operación para activar tu cuenta:
+                  </p>
+                  <input
+                    type="text"
+                    value={flowOrderId}
+                    onChange={(e) => setFlowOrderId(e.target.value)}
+                    placeholder="N° de Orden Flow (ej: 482932) u opcional"
+                    className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-orange-500 shadow-inner font-mono"
+                  />
+                </div>
+
+                <div className="bg-slate-200/60 rounded-xl p-2.5 border border-slate-300 flex justify-between items-center">
+                  <span className="text-[9px] font-mono text-slate-500 uppercase">¿No se abrió la ventana?</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      let directLink = "";
+                      const configCiudadano = paymentConfig?.flowLinkCiudadano;
+                      const configPeriodista = paymentConfig?.flowLinkPeriodista;
+                      const configEmpresa = paymentConfig?.flowLinkEmpresa;
+                      const configMunicipio = paymentConfig?.flowLinkMunicipio;
+
+                      if (selectedPlan.id === "ciudadano") directLink = configCiudadano || "https://www.flow.cl/uri/n0b12Zj9T";
+                      if (selectedPlan.id === "periodista") directLink = configPeriodista || "https://www.flow.cl/uri/Lbx1Q70Lg";
+                      if (selectedPlan.id === "empresa") directLink = configEmpresa || "https://www.flow.cl/uri/TCp4VBjs3";
+                      if (selectedPlan.id === "municipio") directLink = configMunicipio || "https://www.flow.cl/uri/ZNkK6NGwm";
+                      if (directLink) window.open(directLink, "_blank");
+                    }}
+                    className="text-[9px] font-mono font-bold text-orange-600 hover:underline"
+                  >
+                    Reabrir Flow.cl ↗
+                  </button>
+                </div>
+
+                {/* Confirm / Back actions */}
+                <div className="flex gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFlowPending(false);
+                      setFlowOrderId("");
+                    }}
+                    disabled={processing}
+                    className="w-1/3 bg-slate-200 hover:bg-slate-300 disabled:bg-slate-100 disabled:text-slate-400 text-slate-700 border border-slate-300/80 font-mono text-xs font-bold uppercase py-3 rounded-xl transition-all text-center"
+                  >
+                    Atrás
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleExecutePayment}
+                    disabled={processing}
+                    className="w-2/3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white font-mono text-xs font-bold uppercase py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                  >
+                    {processing ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        Validando...
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck className="w-4 h-4" />
+                        Ya realicé mi pago
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
@@ -485,7 +587,7 @@ export const PremiumModule: React.FC<PremiumModuleProps> = ({
                       if (directLink) {
                         return (
                           <span>
-                            <strong>¡Enlace Real de Flow Detectado!</strong> Al confirmar, serás redirigido de forma segura a Flow.cl para completar tu suscripción real. Tu cuenta en el portal se activará simultáneamente para brindarte acceso inmediato.
+                            <strong>¡Enlace Real de Flow Detectado!</strong> Al confirmar, serás redirigido de forma segura a Flow.cl para completar tu suscripción real. Luego deberás confirmar tu pago para activar los beneficios.
                           </span>
                         );
                       }
@@ -503,7 +605,7 @@ export const PremiumModule: React.FC<PremiumModuleProps> = ({
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => setSelectedPlan(null)}
+                    onClick={handleCloseModal}
                     disabled={processing}
                     className="w-1/3 bg-slate-200 hover:bg-slate-300 disabled:bg-slate-100 disabled:text-slate-400 text-slate-700 border border-slate-300/80 font-mono text-xs font-bold uppercase py-3 rounded-xl transition-all text-center"
                   >
