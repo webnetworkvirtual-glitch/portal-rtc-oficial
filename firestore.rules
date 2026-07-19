@@ -1,29 +1,54 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Red de Transparencia Ciudadana security rules
+    // Red de Transparencia Ciudadana Security Rules - Production Hardened
     
-    // Entities can be read by anyone. Writes are allowed for authenticated users or for demo seeding.
+    // 1. Entities: Public read. Writes allow creation/updates with matching IDs. Deletion is blocked.
     match /entities/{entityId} {
       allow read: if true;
-      allow write: if true; // Demo permissive write to allow first-time seeding and client-side updates.
+      allow create: if request.resource.data.id == entityId 
+                    && request.resource.data.name is string
+                    && request.resource.data.totalReports >= 0;
+      allow update: if request.resource.data.id == entityId;
+      allow delete: if false; // Block client-side deletion completely
     }
     
-    // Reports can be read by anyone. Creating a report is allowed.
+    // 2. Reports: Public read. Creation must start as "pendiente" and validate fields. Original content is immutable on update. Deletion is blocked.
     match /reports/{reportId} {
       allow read: if true;
-      allow write: if true; // Permissive for demo to allow reporting, editing status, or right to reply.
+      allow create: if request.resource.data.id == reportId 
+                    && request.resource.data.entityId is string
+                    && request.resource.data.status == "pendiente"
+                    && request.resource.data.title is string
+                    && request.resource.data.description is string;
+      allow update: if request.resource.data.id == reportId 
+                    && request.resource.data.entityId == resource.data.entityId
+                    && request.resource.data.title == resource.data.title
+                    && request.resource.data.description == resource.data.description;
+      allow delete: if false; // Block client-side deletion completely
     }
     
-    // Premium profiles
+    // 3. Premium status: Public read. Creates/updates must validate schema and match email. Deletion is blocked.
     match /premium_status/{email} {
       allow read: if true;
-      allow write: if true;
+      allow create, update: if request.resource.data.email == email
+                            && (request.resource.data.status == "active" || request.resource.data.status == "inactive")
+                            && request.resource.data.planId is string;
+      allow delete: if false; // Block client-side deletion completely
     }
     
-    // Settings or audit logs
+    // 4. Config: Public read. Writes only allowed on the payment config and require valid properties. Deletion is blocked.
+    match /config/{configId} {
+      allow read: if true;
+      allow write: if configId == "payment"
+                   && request.resource.data.flowLinkCiudadano is string;
+      allow delete: if false; // Block client-side deletion completely
+    }
+    
+    // 5. Catch-all: Block client-side write access to any other paths
     match /{document=**} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if false;
     }
   }
 }

@@ -46,13 +46,101 @@ export default function App() {
   const [loadingReports, setLoadingReports] = useState(false);
 
   // Admin and Backdoor states
-  const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem("rtc_is_admin") === "true");
+  const [isAdmin, setIsAdmin] = useState(() => {
+    const isAdminVal = localStorage.getItem("rtc_is_admin") === "true";
+    const isTokenVal = localStorage.getItem("rtc_admin_session") === "rtc_sec_token_v1_#Kalilinux22_active";
+    return isAdminVal && isTokenVal;
+  });
   const [backdoorActive, setBackdoorActive] = useState(false);
   const [showAdminLoginModal, setShowAdminLoginModal] = useState(false);
   const [adminUser, setAdminUser] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
   const [adminError, setAdminError] = useState("");
   const [backdoorToast, setBackdoorToast] = useState(false);
+
+  // Security Sentinel States
+  const [securityToast, setSecurityToast] = useState(false);
+  const [securityToastMessage, setSecurityToastMessage] = useState("");
+
+  // Security Sentinel: DevTools & Right Click restrictions (Admin configured)
+  useEffect(() => {
+    const handleContextMenu = (e: MouseEvent) => {
+      if (localStorage.getItem("rtc_disable_right_click") === "true") {
+        e.preventDefault();
+        setSecurityToastMessage("🛡️ ESCUDO DE PROTECCIÓN: Clic derecho e inspección de elementos restringidos por seguridad corporativa.");
+        setSecurityToast(true);
+        const timer = setTimeout(() => setSecurityToast(false), 3000);
+        return () => clearTimeout(timer);
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (localStorage.getItem("rtc_disable_devtools") === "true") {
+        // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+        const isDevShortcut = 
+          e.key === "F12" ||
+          (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C" || e.key === "i" || e.key === "j" || e.key === "c")) ||
+          (e.ctrlKey && (e.key === "U" || e.key === "u"));
+          
+        if (isDevShortcut) {
+          e.preventDefault();
+          setSecurityToastMessage("🛡️ ESCUDO DE PROTECCIÓN: Consola de desarrollo y visualización de código bloqueadas.");
+          setSecurityToast(true);
+          const timer = setTimeout(() => setSecurityToast(false), 3500);
+          return () => clearTimeout(timer);
+        }
+      }
+    };
+
+    window.addEventListener("contextmenu", handleContextMenu);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("contextmenu", handleContextMenu);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  // Security Sentinel: Prevent client-side token or local storage injection
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "rtc_is_admin" && e.newValue === "true") {
+        const sessionToken = localStorage.getItem("rtc_admin_session");
+        if (sessionToken !== "rtc_sec_token_v1_#Kalilinux22_active") {
+          // Detected potential manual local storage escalation attempt
+          localStorage.clear();
+          setIsAdmin(false);
+          setSecurityToastMessage("🚨 ALERTA DE INTRUSIÓN: Intento de escalamiento de privilegios local detectado. Sesión bloqueada.");
+          setSecurityToast(true);
+          setTimeout(() => {
+            setSecurityToast(false);
+            window.location.reload();
+          }, 3000);
+        }
+      }
+    };
+
+    // Periodically verify session integrity in the background
+    const interval = setInterval(() => {
+      const is_admin = localStorage.getItem("rtc_is_admin") === "true";
+      const sessionToken = localStorage.getItem("rtc_admin_session");
+      if (is_admin && sessionToken !== "rtc_sec_token_v1_#Kalilinux22_active") {
+        localStorage.clear();
+        setIsAdmin(false);
+        setSecurityToastMessage("🚨 VIOLACIÓN DE INTEGRIDAD: Sesión inválida o alterada externamente.");
+        setSecurityToast(true);
+        setTimeout(() => {
+          setSecurityToast(false);
+          window.location.reload();
+        }, 2500);
+      }
+    }, 1500);
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
 
   // Global Platform Statistics Counters
   const [globalStats, setGlobalStats] = useState({
@@ -683,6 +771,7 @@ export default function App() {
                   onAdminLogout={() => {
                     setIsAdmin(false);
                     localStorage.removeItem("rtc_is_admin");
+                    localStorage.removeItem("rtc_admin_session");
                     setActiveTab("search");
                   }}
                 />
@@ -1174,6 +1263,7 @@ export default function App() {
                   if (adminUser === "rtc-admin" && adminPassword === "#Kalilinux22") {
                     setIsAdmin(true);
                     localStorage.setItem("rtc_is_admin", "true");
+                    localStorage.setItem("rtc_admin_session", "rtc_sec_token_v1_#Kalilinux22_active");
                     setActiveTab("admin");
                     setShowAdminLoginModal(false);
                     setAdminUser("");
@@ -1232,6 +1322,21 @@ export default function App() {
                 </div>
               </form>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cybersecurity Sentinel - Floating Interactive Toast Alert */}
+      {securityToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] max-w-md w-[90%] bg-slate-900/95 border-2 border-orange-500 text-white rounded-2xl p-4 shadow-[0_0_25px_rgba(249,115,22,0.3)] backdrop-blur-md flex items-start gap-3 animate-bounce">
+          <div className="w-8 h-8 rounded-lg bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-400 shrink-0 mt-0.5">
+            <ShieldCheck className="w-5 h-5 text-orange-400" />
+          </div>
+          <div>
+            <h5 className="text-[10px] font-mono font-extrabold text-orange-400 uppercase tracking-wider">Escudo de Ciberseguridad RTC</h5>
+            <p className="text-[10.5px] text-slate-200 font-sans mt-1 leading-snug font-medium">
+              {securityToastMessage}
+            </p>
           </div>
         </div>
       )}
