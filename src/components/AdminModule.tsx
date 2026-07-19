@@ -177,10 +177,10 @@ export const AdminModule: React.FC<AdminModuleProps> = ({ onAdminLogout }) => {
         flowLinkPeriodista,
         flowLinkEmpresa,
         flowLinkMunicipio,
-        stripeActive,
+        stripeActive: false,
         stripePublic,
         stripeSecret,
-        mercadopagoActive: mpActive,
+        mercadopagoActive: false,
         mercadopagoPublic: mpPublic,
         mercadopagoSecret: mpSecret,
         updatedAt: new Date().toISOString()
@@ -711,193 +711,146 @@ export const AdminModule: React.FC<AdminModuleProps> = ({ onAdminLogout }) => {
           )}
 
           <form onSubmit={handleSavePaymentConfig} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
               
               {/* Box Flow Chile */}
-              <div className="bg-slate-200/60 rounded-2xl p-4 border border-slate-300/85 space-y-3.5 relative flex flex-col justify-between">
+              <div className="lg:col-span-2 bg-slate-200/60 rounded-2xl p-5 border border-slate-300/85 space-y-4 relative flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-center mb-3">
-                    <span className="font-mono text-[10px] font-extrabold text-slate-700 uppercase">Flow Chile API</span>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
+                      <span className="font-mono text-xs font-extrabold text-slate-700 uppercase">Pasarela de Pago: Flow Chile</span>
+                    </div>
                     <label className="flex items-center gap-1.5 cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={flowActive}
-                        onChange={(e) => setFlowActive(e.target.checked)}
-                        className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                        disabled={true}
+                        checked={true}
+                        className="rounded border-slate-300 text-orange-600 focus:ring-orange-500 opacity-60 cursor-not-allowed"
                       />
-                      <span className="font-mono text-[9px] uppercase font-bold text-slate-500">Activa</span>
+                      <span className="font-mono text-[9px] uppercase font-bold text-orange-600">Activo (Única)</span>
                     </label>
                   </div>
                   
-                  <div className="flex flex-col gap-1 mb-3">
-                    <label className="text-[9px] font-mono uppercase text-slate-500 font-bold">Código de Comercio (ID)</label>
-                    <input
-                      type="text"
-                      value={flowComercio}
-                      onChange={(e) => setFlowComercio(e.target.value)}
-                      placeholder="Ej. 95284"
-                      disabled={!flowActive}
-                      className="bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 shadow-inner disabled:opacity-50"
-                    />
-                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[9px] font-mono uppercase text-slate-500 font-bold">Código de Comercio (ID)</label>
+                      <input
+                        type="text"
+                        value={flowComercio}
+                        onChange={(e) => setFlowComercio(e.target.value)}
+                        placeholder="Ej. 95284"
+                        className="bg-white border border-slate-300 rounded-xl p-2.5 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-orange-500 shadow-inner"
+                      />
+                    </div>
 
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-mono uppercase text-slate-500 font-bold">Llave Secreta HMAC MD5</label>
-                    <input
-                      type="password"
-                      value={flowSecret}
-                      onChange={(e) => setFlowSecret(e.target.value)}
-                      placeholder="Signature Secret Key"
-                      disabled={!flowActive}
-                      className="bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 shadow-inner font-mono disabled:opacity-50"
-                    />
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[9px] font-mono uppercase text-slate-500 font-bold">Llave Secreta HMAC MD5</label>
+                      <input
+                        type="password"
+                        value={flowSecret}
+                        onChange={(e) => setFlowSecret(e.target.value)}
+                        placeholder="Signature Secret Key"
+                        className="bg-white border border-slate-300 rounded-xl p-2.5 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-orange-500 shadow-inner font-mono"
+                      />
+                    </div>
                   </div>
 
                   {/* Flow Direct Payment Links */}
-                  <div className="mt-4 pt-3 border-t border-slate-300/60 space-y-2">
-                    <span className="text-[9px] font-mono uppercase text-slate-500 font-bold block">Enlaces de Pago (Botones Flow.cl)</span>
+                  <div className="mt-4 pt-4 border-t border-slate-300/60 space-y-3">
+                    <div>
+                      <span className="text-[10px] font-mono uppercase text-slate-700 font-extrabold block">Enlaces de Pago (Botones de Pago en Flow.cl)</span>
+                      <p className="text-[9px] text-slate-500 font-sans leading-normal mt-0.5">
+                        El sistema redirigirá automáticamente a los usuarios a estos enlaces específicos creados desde tu panel de Flow.cl.
+                      </p>
+                    </div>
                     
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[8px] font-mono text-slate-400 uppercase">Enlace Plan Ciudadano</label>
-                      <input
-                        type="url"
-                        value={flowLinkCiudadano}
-                        onChange={(e) => setFlowLinkCiudadano(e.target.value)}
-                        placeholder="https://www.flow.cl/btn.php?token=..."
-                        disabled={!flowActive}
-                        className="bg-slate-50 border border-slate-300 rounded-lg p-2 text-[10px] text-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 font-mono disabled:opacity-50"
-                      />
-                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[8px] font-mono text-slate-500 uppercase font-bold">Plan Ciudadano ($3.990)</label>
+                        <input
+                          type="url"
+                          value={flowLinkCiudadano}
+                          onChange={(e) => setFlowLinkCiudadano(e.target.value)}
+                          placeholder="https://www.flow.cl/uri/..."
+                          className="bg-white border border-slate-300 rounded-lg p-2 text-[10px] text-slate-700 focus:outline-none focus:ring-1 focus:ring-orange-500 font-mono shadow-sm"
+                        />
+                      </div>
 
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[8px] font-mono text-slate-400 uppercase">Enlace Plan Periodista</label>
-                      <input
-                        type="url"
-                        value={flowLinkPeriodista}
-                        onChange={(e) => setFlowLinkPeriodista(e.target.value)}
-                        placeholder="https://www.flow.cl/btn.php?token=..."
-                        disabled={!flowActive}
-                        className="bg-slate-50 border border-slate-300 rounded-lg p-2 text-[10px] text-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 font-mono disabled:opacity-50"
-                      />
-                    </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[8px] font-mono text-slate-500 uppercase font-bold">Plan Periodista ($9.990)</label>
+                        <input
+                          type="url"
+                          value={flowLinkPeriodista}
+                          onChange={(e) => setFlowLinkPeriodista(e.target.value)}
+                          placeholder="https://www.flow.cl/uri/..."
+                          className="bg-white border border-slate-300 rounded-lg p-2 text-[10px] text-slate-700 focus:outline-none focus:ring-1 focus:ring-orange-500 font-mono shadow-sm"
+                        />
+                      </div>
 
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[8px] font-mono text-slate-400 uppercase">Enlace Plan Empresa</label>
-                      <input
-                        type="url"
-                        value={flowLinkEmpresa}
-                        onChange={(e) => setFlowLinkEmpresa(e.target.value)}
-                        placeholder="https://www.flow.cl/btn.php?token=..."
-                        disabled={!flowActive}
-                        className="bg-slate-50 border border-slate-300 rounded-lg p-2 text-[10px] text-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 font-mono disabled:opacity-50"
-                      />
-                    </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[8px] font-mono text-slate-500 uppercase font-bold">Plan Empresa ($19.990)</label>
+                        <input
+                          type="url"
+                          value={flowLinkEmpresa}
+                          onChange={(e) => setFlowLinkEmpresa(e.target.value)}
+                          placeholder="https://www.flow.cl/uri/..."
+                          className="bg-white border border-slate-300 rounded-lg p-2 text-[10px] text-slate-700 focus:outline-none focus:ring-1 focus:ring-orange-500 font-mono shadow-sm"
+                        />
+                      </div>
 
-                    <div className="flex flex-col gap-1">
-                      <label className="text-[8px] font-mono text-slate-400 uppercase">Enlace Plan Municipio</label>
-                      <input
-                        type="url"
-                        value={flowLinkMunicipio}
-                        onChange={(e) => setFlowLinkMunicipio(e.target.value)}
-                        placeholder="https://www.flow.cl/btn.php?token=..."
-                        disabled={!flowActive}
-                        className="bg-slate-50 border border-slate-300 rounded-lg p-2 text-[10px] text-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 font-mono disabled:opacity-50"
-                      />
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[8px] font-mono text-slate-500 uppercase font-bold">Plan Municipio ($49.990)</label>
+                        <input
+                          type="url"
+                          value={flowLinkMunicipio}
+                          onChange={(e) => setFlowLinkMunicipio(e.target.value)}
+                          placeholder="https://www.flow.cl/uri/..."
+                          className="bg-white border border-slate-300 rounded-lg p-2 text-[10px] text-slate-700 focus:outline-none focus:ring-1 focus:ring-orange-500 font-mono shadow-sm"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-                <p className="text-[8.5px] text-slate-500 leading-normal font-mono mt-3 border-t border-slate-300/60 pt-2">
-                  ℹ️ Integra tarjetas WebPay de chilenos mediante REST API.
+                <p className="text-[8.5px] text-slate-500 leading-normal font-sans border-t border-slate-300/60 pt-2 flex items-center gap-1.5">
+                  <span>ℹ️</span>
+                  <span>Las suscripciones se gestionan directamente a nivel nacional en Chile con WebPay, Servipag y Multicaja.</span>
                 </p>
               </div>
 
-              {/* Box Stripe */}
-              <div className="bg-slate-200/60 rounded-2xl p-4 border border-slate-300/85 space-y-3.5 relative flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="font-mono text-[10px] font-extrabold text-slate-700 uppercase">Stripe Global</span>
-                    <label className="flex items-center gap-1.5 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={stripeActive}
-                        onChange={(e) => setStripeActive(e.target.checked)}
-                        className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="font-mono text-[9px] uppercase font-bold text-slate-500">Activa</span>
-                    </label>
+              {/* Informative Side Box indicating other platforms are disabled */}
+              <div className="bg-slate-200/40 rounded-2xl p-5 border border-slate-300/60 flex flex-col justify-between">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                    <span className="font-mono text-xs font-extrabold text-slate-500 uppercase">Pasarelas Inactivas</span>
                   </div>
                   
-                  <div className="flex flex-col gap-1 mb-3">
-                    <label className="text-[9px] font-mono uppercase text-slate-500 font-bold">Clave Pública (Publishable Key)</label>
-                    <input
-                      type="text"
-                      value={stripePublic}
-                      onChange={(e) => setStripePublic(e.target.value)}
-                      placeholder="pk_test_..."
-                      disabled={!stripeActive}
-                      className="bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 shadow-inner disabled:opacity-50"
-                    />
+                  <div className="space-y-3.5">
+                    <div className="p-3 bg-slate-200/50 rounded-xl border border-slate-300/40 opacity-70">
+                      <span className="text-[9px] font-mono font-extrabold text-slate-400 uppercase block">Stripe Global</span>
+                      <p className="text-[9px] text-slate-400 font-sans mt-1 leading-normal">
+                        Las transacciones internacionales y cobros en dólares estadounidenses (USD) se encuentran deshabilitados.
+                      </p>
+                    </div>
+
+                    <div className="p-3 bg-slate-200/50 rounded-xl border border-slate-300/40 opacity-70">
+                      <span className="text-[9px] font-mono font-extrabold text-slate-400 uppercase block">Mercado Pago</span>
+                      <p className="text-[9px] text-slate-400 font-sans mt-1 leading-normal">
+                        La integración con cuentas Mercado Pago y cobros rápidos por QR se encuentra desactivada por solicitud administrativa.
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-mono uppercase text-slate-500 font-bold">Clave Privada (Secret Key)</label>
-                    <input
-                      type="password"
-                      value={stripeSecret}
-                      onChange={(e) => setStripeSecret(e.target.value)}
-                      placeholder="sk_test_..."
-                      disabled={!stripeActive}
-                      className="bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 shadow-inner font-mono disabled:opacity-50"
-                    />
+                  <div className="p-3.5 bg-amber-500/5 border border-amber-500/20 rounded-xl">
+                    <p className="text-[9.5px] font-sans text-amber-800 leading-relaxed font-semibold">
+                      💡 Única Operatividad: Todo el flujo de pagos ha sido canalizado exclusivamente a través de los enlaces de Flow Chile para garantizar una experiencia óptima y comprensible a tus usuarios chilenos.
+                    </p>
                   </div>
                 </div>
-                <p className="text-[8.5px] text-slate-500 leading-normal font-mono mt-3 border-t border-slate-300/60 pt-2">
-                  ℹ️ Permite transacciones en dólares USD de alta seguridad.
-                </p>
-              </div>
 
-              {/* Box Mercado Pago */}
-              <div className="bg-slate-200/60 rounded-2xl p-4 border border-slate-300/85 space-y-3.5 relative flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="font-mono text-[10px] font-extrabold text-slate-700 uppercase">Mercado Pago</span>
-                    <label className="flex items-center gap-1.5 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={mpActive}
-                        onChange={(e) => setMpActive(e.target.checked)}
-                        className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="font-mono text-[9px] uppercase font-bold text-slate-500">Activa</span>
-                    </label>
-                  </div>
-                  
-                  <div className="flex flex-col gap-1 mb-3">
-                    <label className="text-[9px] font-mono uppercase text-slate-500 font-bold">Public Key (MercadoLibre)</label>
-                    <input
-                      type="text"
-                      value={mpPublic}
-                      onChange={(e) => setMpPublic(e.target.value)}
-                      placeholder="APP_USR-..."
-                      disabled={!mpActive}
-                      className="bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 shadow-inner disabled:opacity-50"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[9px] font-mono uppercase text-slate-500 font-bold">Access Token</label>
-                    <input
-                      type="password"
-                      value={mpSecret}
-                      onChange={(e) => setMpSecret(e.target.value)}
-                      placeholder="TEST-..."
-                      disabled={!mpActive}
-                      className="bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-purple-500 shadow-inner font-mono disabled:opacity-50"
-                    />
-                  </div>
-                </div>
-                <p className="text-[8.5px] text-slate-500 leading-normal font-mono mt-3 border-t border-slate-300/60 pt-2">
-                  ℹ️ Procesa pagos instantáneos con QR o monederos locales.
+                <p className="text-[8.5px] text-slate-400 font-mono leading-normal pt-4 mt-4 border-t border-slate-300/40">
+                  ⚙️ Configurado para producción local.
                 </p>
               </div>
 

@@ -530,42 +530,17 @@ export const PremiumModule: React.FC<PremiumModuleProps> = ({
                   </div>
                 </div>
 
-                {/* Gateway Selection Tabs (Tactile as visual guidelines) */}
+                {/* Gateway Selection (Only Flow is active as requested) */}
                 <div className="space-y-2">
-                  <label className="text-[9px] font-mono uppercase text-slate-500 font-bold block">Seleccionar Pasarela de Pago</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(() => {
-                      const gates = [
-                        { id: "flow", label: "Flow Chile", desc: "BancoEstado / WebPay", active: paymentConfig ? paymentConfig.flowActive : true },
-                        { id: "stripe", label: "Stripe", desc: "Tarjetas Int.", active: paymentConfig ? paymentConfig.stripeActive : true },
-                        { id: "mercadopago", label: "Mercado Pago", desc: "Monedero", active: paymentConfig ? paymentConfig.mercadopagoActive : true }
-                      ].filter(gate => gate.active !== false);
-
-                      if (gates.length === 0) {
-                        return (
-                          <div className="col-span-3 p-3 bg-rose-500/10 border border-rose-500/20 text-rose-700 text-[10px] text-center rounded-xl font-mono">
-                            ⚠️ SIN PASARELAS DE PAGO ACTIVAS. CONTACTE AL ADMINISTRADOR.
-                          </div>
-                        );
-                      }
-
-                      return gates.map((gate) => (
-                        <button
-                          key={gate.id}
-                          onClick={() => setPaymentMethod(gate.id as any)}
-                          className={`p-3 rounded-xl border text-left flex flex-col justify-between h-20 transition-all ${
-                            paymentMethod === gate.id
-                              ? "bg-slate-200 border-orange-500/40 shadow-inner"
-                              : "bg-slate-50 border-slate-200 hover:bg-slate-200/40"
-                          }`}
-                        >
-                          <span className={`text-[10px] font-mono font-extrabold uppercase ${paymentMethod === gate.id ? "text-orange-600" : "text-slate-700"}`}>
-                            {gate.label}
-                          </span>
-                          <span className="text-[8px] text-slate-400 font-sans mt-1 leading-snug">{gate.desc}</span>
-                        </button>
-                      ));
-                    })()}
+                  <label className="text-[9px] font-mono uppercase text-slate-500 font-bold block">Pasarela de Pago Activa</label>
+                  <div className="p-3 bg-slate-200/80 rounded-xl border border-slate-300 flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-600 shrink-0">
+                      <CreditCard className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <div>
+                      <h5 className="text-[10px] font-mono font-extrabold text-slate-800 uppercase leading-none">Flow Chile</h5>
+                      <p className="text-[8.5px] text-slate-500 font-sans mt-1">Soporta WebPay Plus, Tarjetas de Crédito/Débito, Servipag y Multicaja</p>
+                    </div>
                   </div>
                 </div>
 
